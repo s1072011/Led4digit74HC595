@@ -35,13 +35,14 @@ LOW bit = active lighting led segment
 #ifndef Led4digit74HC595_h
 #define Led4digit74HC595_h
 #include <Arduino.h>
-  
+
 class Led4digit74HC595
 {
 	public:
 		Led4digit74HC595(int SCLK, int RCLK, int DIO);
 		void setNumber(int n);								//main function = number to be show on display in periodical call show() [from -999 to +9999]
-		void loopShow();									//periodic call action in main loop of program and show muptiplexing number
+		void setString(char *c);
+      void loopShow();									//periodic call action in main loop of program and show muptiplexing number
 		void setDecimalPoint(unsigned char position);		//set decimal poit disable (0) or enable on position (1-4)
 		void sleep();										//temporary dark display if not multiplexed and wait for ending another long time operation
 		//void test();
