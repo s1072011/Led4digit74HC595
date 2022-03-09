@@ -152,7 +152,23 @@ void Led4digit74HC595::setNumber(int _n)
   if (_dp == 3) _char[2] = _char[2] | B10000000;
   if (_dp == 4) _char[3] = _char[3] | B10000000;
 }
+void Led4digit74HC595::setTemperature(float _n){
+  int temp = int(_n*10);
+  int one, ten, hundred;
+  one = temp % 10;
+  ten = (temp / 10) % 10;
+  hundred = temp / 100;
 
+  _char[3] = LED_CHAR(hundred + 48);
+  _char[2] = LED_CHAR(ten + 48);
+  _char[1] = LED_CHAR(one + 48);
+  _char[0] = LED_CHAR('c');
+
+  if (_dp == 1) _char[0] = _char[0] | B10000000;  //add decimal point
+  if (_dp == 2) _char[1] = _char[1] | B10000000;
+  if (_dp == 3) _char[2] = _char[2] | B10000000;
+  if (_dp == 4) _char[3] = _char[3] | B10000000;
+}
 void Led4digit74HC595::setString(char *c) {
   uint16_t length = strlen(c);
   if (length <= 4) {
@@ -183,7 +199,16 @@ void Led4digit74HC595::setString(char *c) {
   if (_dp == 3) _char[2] = _char[2] | B10000000;
   if (_dp == 4) _char[3] = _char[3] | B10000000;
 }
-
+void Led4digit74HC595::setString(char a,char b,char c,char d){
+    _char[3] = a;
+    _char[2] = b;
+    _char[1] = c;
+    _char[0] = d;
+	if (_dp == 1) _char[0] = _char[0] | B10000000;  //add decimal point
+  	if (_dp == 2) _char[1] = _char[1] | B10000000;
+  	if (_dp == 3) _char[2] = _char[2] | B10000000;
+  	if (_dp == 4) _char[3] = _char[3] | B10000000;
+}
 // Periodic call action in main loop of program
 void Led4digit74HC595::loopShow()
 {
