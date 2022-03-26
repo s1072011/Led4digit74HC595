@@ -42,8 +42,11 @@ class Led4digit74HC595
 		Led4digit74HC595(int SCLK, int RCLK, int DIO);
 		void setNumber(int n);								//main function = number to be show on display in periodical call show() [from -999 to +9999]
 		void setTemperature(float n);
-      void setString(char *c);
-      void setString(char a,char b,char c,char d);
+      void setString(const char *c);
+      void set(char a,char b,char c,char d);
+      void setScroller(byte c[],int length, unsigned int delay,byte mode);
+      void setScroller(byte c[],int length, unsigned int delay, unsigned int space,byte mode);
+      void rotate(unsigned int delay, byte mode);
       void loopShow();									//periodic call action in main loop of program and show muptiplexing number
 		void setDecimalPoint(unsigned char position);		//set decimal poit disable (0) or enable on position (1-4)
 		void sleep();										//temporary dark display if not multiplexed and wait for ending another long time operation
@@ -57,7 +60,19 @@ class Led4digit74HC595
 		int _SCLK;
 		int _RCLK;
 		int _DIO;
-		int _char[4];				//prepared digits char index for to be show
+		uint8_t _char[4];				//prepared digits char index for to be show
+      byte r[48]={0x01,0x01,0x01,0x01,
+                  0x00,0x01,0x01,0x03,
+                  0x00,0x00,0x01,0x07,
+                  0x00,0x00,0x00,0x0f,
+                  0x00,0x00,0x08,0x0e,
+                  0x00,0x08,0x08,0x0c,
+                  0x08,0x08,0x08,0x08,
+                  0x18,0x08,0x08,0x00,
+                  0x38,0x08,0x00,0x00,
+                  0x39,0x00,0x00,0x00,
+                  0x31,0x01,0x00,0x00,
+                  0x21,0x01,0x01,0x00};
 };
  
 #endif

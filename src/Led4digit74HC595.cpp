@@ -73,6 +73,7 @@ uint8_t LED_CHAR(char c) {
     case '7': return 0x07;
     case '8': return 0x7f;
     case '9': return 0x6f;
+    default: return c;
   }
   return 0;
 }
@@ -100,13 +101,13 @@ Led4digit74HC595::Led4digit74HC595(int SCLK, int RCLK, int DIO)
 void Led4digit74HC595::setNumber(int _n)
 {
   if (_n > 9999) {
-    for (char c = 0 ; c < 4; c++) {
+    for (unsigned short c = 0 ; c < 4; c++) {
       _char[c] = LED_CHAR('-');   //13=index for upper - char
     }
     return;
   }
   if (_n < -999) {
-    for (char c = 0 ; c < 4; c++) {
+    for (unsigned short c = 0 ; c < 4; c++) {
       _char[c] = LED_CHAR('_');  //12=index for _ char
     }
     return;
@@ -147,10 +148,10 @@ void Led4digit74HC595::setNumber(int _n)
   }
 
 
-  if (_dp == 1) _char[0] = _char[0] | B10000000;  //add decimal point
-  if (_dp == 2) _char[1] = _char[1] | B10000000;
-  if (_dp == 3) _char[2] = _char[2] | B10000000;
-  if (_dp == 4) _char[3] = _char[3] | B10000000;
+  if (_dp == 1) _char[0] = _char[0] | 0B10000000;  //add decimal point
+  if (_dp == 2) _char[1] = _char[1] | 0B10000000;
+  if (_dp == 3) _char[2] = _char[2] | 0B10000000;
+  if (_dp == 4) _char[3] = _char[3] | 0B10000000;
 }
 void Led4digit74HC595::setTemperature(float _n){
   int temp = int(_n*10);
@@ -164,13 +165,13 @@ void Led4digit74HC595::setTemperature(float _n){
   _char[1] = LED_CHAR(one + 48);
   _char[0] = LED_CHAR('c');
 
-  if (_dp == 1) _char[0] = _char[0] | B10000000;  //add decimal point
-  if (_dp == 2) _char[1] = _char[1] | B10000000;
-  if (_dp == 3) _char[2] = _char[2] | B10000000;
-  if (_dp == 4) _char[3] = _char[3] | B10000000;
+  if (_dp == 1) _char[0] = _char[0] | 0B10000000;  //add decimal point
+  if (_dp == 2) _char[1] = _char[1] | 0B10000000;
+  if (_dp == 3) _char[2] = _char[2] | 0B10000000;
+  if (_dp == 4) _char[3] = _char[3] | 0B10000000;
 }
-void Led4digit74HC595::setString(char *c) {
-  uint16_t length = strlen(c);
+void Led4digit74HC595::setString(const char *c) {
+  unsigned int length = strlen(c);
   if (length <= 4) {
     char *_c;
     _c = new char[length];
@@ -194,26 +195,100 @@ void Led4digit74HC595::setString(char *c) {
     _char[0] = LED_CHAR('R');
   }
 
-  if (_dp == 1) _char[0] = _char[0] | B10000000;  //add decimal point
-  if (_dp == 2) _char[1] = _char[1] | B10000000;
-  if (_dp == 3) _char[2] = _char[2] | B10000000;
-  if (_dp == 4) _char[3] = _char[3] | B10000000;
+  if (_dp == 1) _char[0] = _char[0] | 0B10000000;  //add decimal point
+  if (_dp == 2) _char[1] = _char[1] | 0B10000000;
+  if (_dp == 3) _char[2] = _char[2] | 0B10000000;
+  if (_dp == 4) _char[3] = _char[3] | 0B10000000;
 }
-void Led4digit74HC595::setString(char a,char b,char c,char d){
-    _char[3] = a;
-    _char[2] = b;
-    _char[1] = c;
-    _char[0] = d;
-	if (_dp == 1) _char[0] = _char[0] | B10000000;  //add decimal point
-  	if (_dp == 2) _char[1] = _char[1] | B10000000;
-  	if (_dp == 3) _char[2] = _char[2] | B10000000;
-  	if (_dp == 4) _char[3] = _char[3] | B10000000;
+void Led4digit74HC595::set(char a,char b,char c,char d){
+  _char[3] = a;
+  _char[2] = b;
+  _char[1] = c;
+  _char[0] = d;
+	if (_dp == 1) _char[0] = _char[0] | 0B10000000;  //add decimal point
+  if (_dp == 2) _char[1] = _char[1] | 0B10000000;
+  if (_dp == 3) _char[2] = _char[2] | 0B10000000;
+  if (_dp == 4) _char[3] = _char[3] | 0B10000000;
+}
+
+void Led4digit74HC595::setScroller(byte c[], int length, unsigned int delay, byte mode){
+  static int flag = 0;
+  static unsigned long lastTime = millis();
+  if(millis() - lastTime > delay){
+    switch (mode)
+    {
+    case 'L':
+      if(flag >= length) flag = 0;
+      _char[0] = c[(flag+3>=length)?flag+3-length:flag+3];
+      _char[1] = c[(flag+2>=length)?flag+2-length:flag+2];
+      _char[2] = c[(flag+1>=length)?flag+1-length:flag+1];
+      _char[3] = c[flag];
+      flag++;
+      break;
+    case 'R':
+      if(flag < 0) flag = length;
+      _char[0] = c[(flag+3>=length)?flag+3-length:flag+3];
+      _char[1] = c[(flag+2>=length)?flag+2-length:flag+2];
+      _char[2] = c[(flag+1>=length)?flag+1-length:flag+1];
+      _char[3] = c[flag];
+      flag--;
+      break;
+    case 'B':
+      break;
+    }
+    if (_dp == 1) _char[0] = _char[0] | 0B10000000;
+    if (_dp == 2) _char[1] = _char[1] | 0B10000000;
+    if (_dp == 3) _char[2] = _char[2] | 0B10000000;
+    if (_dp == 4) _char[3] = _char[3] | 0B10000000;
+    lastTime = millis();
+  }
+}
+
+void Led4digit74HC595::setScroller(byte c[],int length, unsigned int delay, unsigned int space, byte mode){
+  byte temp[length+space];
+  for(int i = 0;i<length; i++){
+    temp[i] = c[i];
+  }
+  for(int i = length;i<length + space; i++){
+    temp[i] = 0;
+  }
+  Led4digit74HC595::setScroller(temp, (length+space), delay, mode);
+}
+void Led4digit74HC595::rotate(unsigned int delay, byte mode){
+  static int flag = 0;
+  static unsigned long lastTime = millis();
+  if(millis() - lastTime > delay){
+    switch (mode)
+    {
+    case 'L':
+      if(flag<0) flag = 44;
+      _char[0] = r[flag+3];
+      _char[1] = r[flag+2];
+      _char[2] = r[flag+1];
+      _char[3] = r[flag];
+      lastTime = millis();
+      flag-=4;
+      break;
+    case 'R':
+      if(flag>=48) flag = 0;
+      _char[0] = r[flag+3];
+      _char[1] = r[flag+2];
+      _char[2] = r[flag+1];
+      _char[3] = r[flag];
+      lastTime = millis();
+      flag+=4;
+      break;
+    }
+    if (_char[1]==0x08) _char[1] = _char[1] | 0B10000000;
+    if (_char[2]==0x08) _char[2] = _char[2] | 0B10000000;
+    if (_char[3]==0x08||_char[3]==0x18||_char[3]==0x38||_char[3]==0x39) _char[3] = _char[3] | 0B10000000;
+  }
 }
 // Periodic call action in main loop of program
 void Led4digit74HC595::loopShow()
 {
 
-  byte port = B0001 << _showPos;
+  byte port = 0B0001 << _showPos;
   //writeByte(~_LED_CHAR[_char[_showPos]]);
   writeByte(~_char[_showPos]);    //Led bits for module must be negated (~)
   writeByte(port);
@@ -234,7 +309,7 @@ void Led4digit74HC595::writeByte(unsigned char X)
   for (char i = 0; i < 8; i++)
   {
     //select left one bit and check if is 1 or 0
-    if (X & B10000000) {
+    if (X & 0B10000000) {
       digitalWrite(_DIO, HIGH);
     } else {
       digitalWrite(_DIO, LOW);
@@ -251,13 +326,13 @@ void Led4digit74HC595::setDecimalPoint(unsigned char position)
 {
   if (position > 4) position = 4;
   _dp = position;
-  for (char c = 0; c < 4; c++) {
-    _char[c] = _char[c] & B01111111;    //remove decimal point
+  for (unsigned short c = 0; c < 4; c++) {
+    _char[c] = _char[c] & 0B01111111;    //remove decimal point
   }
-  if (_dp == 1) _char[0] = _char[0] | B10000000;  //add decimal point
-  if (_dp == 2) _char[1] = _char[1] | B10000000;
-  if (_dp == 3) _char[2] = _char[2] | B10000000;
-  if (_dp == 4) _char[3] = _char[3] | B10000000;
+  if (_dp == 1) _char[0] = _char[0] | 0B10000000;  //add decimal point
+  if (_dp == 2) _char[1] = _char[1] | 0B10000000;
+  if (_dp == 3) _char[2] = _char[2] | 0B10000000;
+  if (_dp == 4) _char[3] = _char[3] | 0B10000000;
 }
 
 
