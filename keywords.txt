@@ -1,11 +1,11 @@
 Led4digit74HC595	KEYWORD1
 
 setNumber	KEYWORD2
-setTemperature KEYWORD2
-setString	KEYWORD2
-set	KEYWORD2
-setScroller KEYWORD2
-
+setTemperature 	KEYWORD2
+setString		KEYWORD2
+set		KEYWORD2
+setScroller	KEYWORD2
+rotate 		KEYWORD2
 loopShow	KEYWORD2
 
 setDecimalPoint	KEYWORD2
